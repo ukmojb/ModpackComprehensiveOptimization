@@ -1,6 +1,7 @@
 package dev.mco.mixin.astralsorcery;
 
-import com.smd.gctcore.client.DirectBufferCleaner;
+import dev.mco.mixin.early.AccessorBufferBuilder;
+import io.netty.util.internal.PlatformDependent;
 import dev.mco.ModpackComprehensiveOptimization;
 import hellfirepvp.astralsorcery.client.gui.GuiJournalPerkTree;
 import hellfirepvp.astralsorcery.client.gui.journal.GuiScreenJournal;
@@ -90,12 +91,16 @@ public abstract class MixinGuiJournalPerkTree extends GuiScreenJournal {
     }
 
     @Unique
+    private static void mco$release(BufferBatch batch) {
+        AccessorBufferBuilder builder = (AccessorBufferBuilder) (Object) batch.getBuffer();
+        PlatformDependent.freeDirectBuffer(builder.mco$getByteBuffer());
+    }
+
+    @Unique
     private static void mco$releaseDrawBuffers() {
         int released = 0;
         if (drawBufferConnections != null) {
-            DirectBufferCleaner.freeBufferBuilder(
-                    ((AccessorBufferBatch) (Object) drawBufferConnections).mco$getBuffer()
-            );
+            mco$release(drawBufferConnections);
             drawBufferConnections = null;
             released++;
         }
@@ -105,9 +110,7 @@ public abstract class MixinGuiJournalPerkTree extends GuiScreenJournal {
             if (groups != null) {
                 for (BufferBatch batch : groups.values()) {
                     if (batch != null) {
-                        DirectBufferCleaner.freeBufferBuilder(
-                                ((AccessorBufferBatch) (Object) batch).mco$getBuffer()
-                        );
+                        mco$release(batch);
                         released++;
                     }
                 }

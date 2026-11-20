@@ -1,6 +1,6 @@
 package dev.mco.mixin.betternether;
 
-import com.smd.gctcore.common.integration.betternether.BetterNetherCityCacheHelper;
+import dev.mco.internal.cache.NetherCityCache;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,7 +17,7 @@ public abstract class MixinBNWorldGenerator {
 
     @Inject(method = "init(Lnet/minecraft/world/World;)V", at = @At("HEAD"), remap = false)
     private static void mco$recordNetherWorld(World world, CallbackInfo ci) {
-        BetterNetherCityCacheHelper.onNetherWorldLoad(world);
+        NetherCityCache.onNetherWorldLoad(world);
     }
 
     @Redirect(
@@ -35,12 +35,12 @@ public abstract class MixinBNWorldGenerator {
 
     @Inject(method = "smoothChunk(Lnet/minecraft/world/World;II)V", at = @At("HEAD"), remap = false)
     private static void mco$ensureCityManagerOnNetherGen(World world, int cx, int cz, CallbackInfo ci) {
-        BetterNetherCityCacheHelper.ensureCityManagerForNether(world);
+        NetherCityCache.ensureCityManagerForNether(world);
     }
 
     @Inject(method = "save(Lnet/minecraft/world/World;)V", at = @At("RETURN"), remap = false)
     private static void mco$demoteCityManagerWhenIdle(World world, CallbackInfo ci) {
-        BetterNetherCityCacheHelper.onAfterWorldSave(world);
+        NetherCityCache.onAfterWorldSave(world);
     }
 
     @Inject(
@@ -50,7 +50,7 @@ public abstract class MixinBNWorldGenerator {
             remap = false
     )
     private static void mco$computeNearestCityIfUnloaded(World world, int cx, int cz, CallbackInfoReturnable<BlockPos> cir) {
-        BlockPos fallback = BetterNetherCityCacheHelper.computeNearestCityIfUnloaded(world, cx, cz);
+        BlockPos fallback = NetherCityCache.computeNearestCityIfUnloaded(world, cx, cz);
         if (fallback != null) {
             cir.setReturnValue(fallback);
         }

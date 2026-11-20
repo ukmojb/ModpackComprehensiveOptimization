@@ -8,6 +8,7 @@
   },
   "client": [
     "MixinMaterialWrapper",
-    "MixinSmeltingRecipeWrapper"
+    "MixinSmeltingRecipeWrapper",
+    "MixinJeiLoad"
   ]
 }

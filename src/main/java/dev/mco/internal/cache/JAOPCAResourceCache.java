@@ -4,6 +4,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.util.ResourceLocation;
 
+import dev.mco.ModpackComprehensiveOptimization;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,7 +33,10 @@ public final class JAOPCAResourceCache {
     private static boolean resourceExists(ResourceLocation location) {
         try (IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(location)) {
             return resource != null;
-        } catch (Exception ignored) {
+        } catch (FileNotFoundException missing) {
+            return false;
+        } catch (IOException failure) {
+            ModpackComprehensiveOptimization.LOGGER.warn("读取 JAOPCA 资源 {} 失败", location, failure);
             return false;
         }
     }

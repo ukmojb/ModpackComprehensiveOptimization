@@ -63,29 +63,21 @@ public final class LumbermillRecipeIndex {
         if (recipe == null) {
             return false;
         }
-        try {
-            ItemStack output = recipe.getRecipeOutput();
-            if (!recipe.isDynamic() && output != null && !output.isEmpty() && !hasOreIdSafe(output, plankOreId)) {
-                return false;
-            }
-            return !isMultiIngredientStandardRecipe(recipe);
-        } catch (RuntimeException | LinkageError e) {
-            return true;
+        ItemStack output = recipe.getRecipeOutput();
+        if (!recipe.isDynamic() && output != null && !output.isEmpty() && !hasOreIdSafe(output, plankOreId)) {
+            return false;
         }
+        return !isMultiIngredientStandardRecipe(recipe);
     }
 
     private static boolean hasOreIdSafe(ItemStack stack, int oreId) {
-        try {
-            int[] ids = OreDictionary.getOreIDs(stack);
-            for (int id : ids) {
-                if (id == oreId) {
-                    return true;
-                }
+        int[] ids = OreDictionary.getOreIDs(stack);
+        for (int id : ids) {
+            if (id == oreId) {
+                return true;
             }
-            return false;
-        } catch (RuntimeException | LinkageError e) {
-            return true;
         }
+        return false;
     }
 
     private static boolean isMultiIngredientStandardRecipe(IRecipe recipe) {

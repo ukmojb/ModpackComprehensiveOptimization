@@ -20,7 +20,7 @@ public abstract class MixinRawGeometryTree {
         if (result != null) {
             int count = model.getMinecraftGeometry()[0].getBones().length;
             if (count >= 1000) {
-                ModpackComprehensiveOptimization.LOGGER.info("[GCTCore-GeckoHierarchy] Indexed {} bones for {} in {}ms.",
+                ModpackComprehensiveOptimization.LOGGER.info("[mco/GeckoLib] Indexed {} bones for {} in {}ms.",
                         count, location, (System.nanoTime() - start) / 1_000_000);
             }
             cir.setReturnValue(result);

@@ -43,6 +43,8 @@ configurations {
     runtimeOnly.extendsFrom(modRuntimeOnly)
 }
 
+apply from: 'gradle/scripts/dependencies.gradle'
+
 def remapTaskName = enable_shadow.toBoolean() ? "remapShadowJar" : "remapJar"
 
 //noinspection GroovyAssignabilityCheck
@@ -103,7 +105,7 @@ dependencies {
     }
 }
 
-apply from: 'gradle/scripts/dependencies.gradle'
+
 
 processResources {
     rename '(.+_at.cfg)', 'META-INF/$1'

@@ -1,8 +1,6 @@
 package dev.mco.mixin.hei;
 
 import dev.mco.internal.jei.HeiHashCacheHelper;
-import dev.mco.internal.jei.TransposerContainerCache;
-import dev.mco.internal.jei.TConMaterialRecipeIndex;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.gui.textures.Textures;
 import mezz.jei.startup.JeiStarter;
@@ -23,8 +21,6 @@ public abstract class MixinJeiStarter {
     )
     private void mco$onJeiLoadStart(List<IModPlugin> plugins, Textures textures, boolean isReload, CallbackInfo ci) {
         HeiHashCacheHelper.beginLoad();
-        TransposerContainerCache.beginLoad();
-        TConMaterialRecipeIndex.beginLoad();
     }
 
     @Inject(
@@ -34,7 +30,5 @@ public abstract class MixinJeiStarter {
     )
     private void mco$onJeiLoadEnd(List<IModPlugin> plugins, Textures textures, boolean isReload, CallbackInfo ci) {
         HeiHashCacheHelper.endLoad();
-        TransposerContainerCache.endLoad();
-        TConMaterialRecipeIndex.endLoad();
     }
 }
