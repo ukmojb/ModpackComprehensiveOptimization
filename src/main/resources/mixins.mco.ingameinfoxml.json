@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8.5",
+  "package": "dev.mco.mixin.ingameinfoxml",
+  "compatibilityLevel": "JAVA_25",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "MixinInGameInfoCore",
+    "MixinInfoItem",
+    "MixinItemKey"
+  ]
+}

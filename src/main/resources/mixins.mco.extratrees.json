@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8.5",
+  "package": "dev.mco.mixin.extratrees",
+  "compatibilityLevel": "JAVA_25",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "MixinLumbermillRecipeMaker",
+    "MixinLumbermillRecipeManager"
+  ]
+}

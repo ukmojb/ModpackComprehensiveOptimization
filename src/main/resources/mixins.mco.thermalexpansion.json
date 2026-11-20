@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8.5",
+  "package": "dev.mco.mixin.thermalexpansion",
+  "compatibilityLevel": "JAVA_25",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "MixinTransposerRecipeCategory",
+    "MixinTransposerRecipeLayout",
+    "MixinTransposerRecipeWrapperContainer",
+    "TransposerIngredientsAccessor"
+  ]
+}

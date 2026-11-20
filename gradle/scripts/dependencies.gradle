@@ -1,0 +1,38 @@
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven { url = 'https://cursemaven.com' }
+        }
+        filter { includeGroup 'curse.maven' }
+    }
+}
+
+dependencies {
+    modCompileOnly 'curse.maven:additions-mod-321781:3000908'
+    modCompileOnly 'curse.maven:astral-sorcery-241721:3044416'
+    modCompileOnly 'curse.maven:avaritia-1.1x-kedition-913129:6118927'
+    modCompileOnly 'curse.maven:betternether-rotn-edition-468526:3655246'
+    modCompileOnly 'curse.maven:binnies-mods-patched-899182:7731146'
+    modCompileOnly 'curse.maven:codechickenlib-242818:2779848'
+    modCompileOnly 'curse.maven:cofh-core-69162:2920433'
+    modCompileOnly 'curse.maven:compact-machines-224218:2707509'
+    modCompileOnly 'curse.maven:crafttweaker-239197:8051578'
+    modCompileOnly 'curse.maven:enderstorage-1354035:7035940'
+    modCompileOnly 'curse.maven:forestry-59751:7398359'
+    modCompileOnly 'curse.maven:geckolib-388172:4020277'
+    modCompileOnly 'curse.maven:had-enough-items-557549:8648715'
+    modCompileOnly 'curse.maven:ingame-info-xml-canoeedition-1456057:8505570'
+    modCompileOnly 'curse.maven:jaopca-266936:7125072'
+    modCompileOnly 'curse.maven:mantle-74924:2713386'
+    modCompileOnly 'curse.maven:mct-smeltery-io-326155:8530115'
+    modCompileOnly 'curse.maven:mekanism-ce-unofficial-840735:8640677'
+    modCompileOnly 'curse.maven:nuclearcraft-overhauled-336895:8133438'
+    modCompileOnly 'curse.maven:projecte-226410:2702991'
+    modCompileOnly 'curse.maven:raids-backport-977633:7890943'
+    modCompileOnly 'curse.maven:recipe-stages-280554:3405071'
+    modCompileOnly 'curse.maven:tconstruct-74072:2902483'
+    modCompileOnly 'curse.maven:thaumic-concilium-kedition-1329883:8392890'
+    modCompileOnly 'curse.maven:the-spice-of-life-220811:2571951'
+    modCompileOnly 'curse.maven:thermal-expansion-69163:2926431'
+    modCompileOnly 'curse.maven:tinkers-complement-272671:2843439'
+}
