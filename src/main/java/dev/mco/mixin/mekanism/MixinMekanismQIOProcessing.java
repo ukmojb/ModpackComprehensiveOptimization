@@ -1,22 +1,19 @@
 package dev.mco.mixin.mekanism;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import dev.mco.internal.cache.QioRecipeScan;
 import mekanism.qioprocessing.common.MekanismQIOProcessing;
-import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
+import mekanism.qioprocessing.common.planning.QIORecipeCatalogService;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = MekanismQIOProcessing.class, remap = false)
 public abstract class MixinMekanismQIOProcessing {
-
-    @Inject(
-            method = "serverStarted(Lnet/minecraftforge/fml/common/event/FMLServerStartedEvent;)V",
-            at = @At("HEAD"),
-            cancellable = true,
-            remap = false
-    )
-    private void mco$skipEagerQioCatalogScan(FMLServerStartedEvent event, CallbackInfo ci) {
-        ci.cancel();
+    @WrapOperation(method = "serverStarted", at = @At(value = "INVOKE",
+            target = "Lmekanism/qioprocessing/common/planning/QIORecipeCatalogService;refresh(Lnet/minecraft/world/World;)V"))
+    private void mco$deferStartupScan(QIORecipeCatalogService catalog, World world, Operation<Void> refresh) {
+        ScopedValue.where(QioRecipeScan.STARTUP, true).run(() -> refresh.call(catalog, world));
     }
 }

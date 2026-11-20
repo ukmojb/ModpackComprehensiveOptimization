@@ -8,9 +8,5 @@
   },
   "mixins": [
     "MixinAdvancementArchiveReuse"
-  ],
-  "client": [
-    "AccessorBufferBuilder",
-    "MixinSimpleReloadableResourceManager"
   ]
 }

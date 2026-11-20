@@ -1,5 +1,6 @@
 package dev.mco;
 
+import dev.mco.bootstrap.PatchSelection;
 import zone.rong.mixinbooter.Context;
 import zone.rong.mixinbooter.ILateMixinLoader;
 
@@ -13,7 +14,8 @@ public final class OptionalMixins implements ILateMixinLoader {
             for (String mod : mods) {
                 if (!context.isModPresent(mod)) return false;
             }
-            return marker == null || OptionalMixins.class.getClassLoader().getResource(marker) != null;
+            return (marker == null || OptionalMixins.class.getClassLoader().getResource(marker) != null)
+                    && PatchSelection.enabled(context, mods[0]);
         }
     }
 
@@ -22,6 +24,9 @@ public final class OptionalMixins implements ILateMixinLoader {
             new Patch("astralsorcery", null, "astralsorcery"),
             new Patch("avaritia", null, "avaritia"),
             new Patch("betternether", "paulevs/betternether/noise/PregennedOpenSimplexNoise.class", "betternether"),
+            new Patch("chancecubes", null, "chancecubes"),
+            new Patch("chancecubes.astral", null, "chancecubes", "astralsorcery"),
+            new Patch("mantle", null, "mantle"),
             new Patch("compactmachines3", null, "compactmachines3"),
             new Patch("enderstorage", null, "enderstorage"),
             new Patch("extratrees", null, "extratrees", "jei"),

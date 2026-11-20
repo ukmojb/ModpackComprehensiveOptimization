@@ -1,6 +1,5 @@
 package dev.mco.internal.cache;
 
-import dev.mco.mixin.betternether.CityManagerAccessor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -11,14 +10,17 @@ import paulevs.betternether.config.ConfigLoader;
 import paulevs.betternether.structures.city.CityStructureManager;
 
 import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
+import java.util.Map;
 import java.util.Random;
+import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 
 public final class NetherCityCache {
-    private static WeakReference<World> owner = new WeakReference<>(null);
-    private static SoftReference<CityStructureManager> idle = new SoftReference<>(null);
-    private static long lastUse;
+    private static final Map<World, NetherCityCache> WORLDS = new WeakHashMap<>();
+
+    private CityStructureManager active;
+    private SoftReference<CityStructureManager> idle = new SoftReference<>(null);
+    private long lastUse;
 
     static {
         MinecraftForge.EVENT_BUS.register(NetherCityCache.class);
@@ -26,30 +28,29 @@ public final class NetherCityCache {
 
     private NetherCityCache() {}
 
-    public static synchronized void onNetherWorldLoad(World world) {
-        if (world.isRemote || world.provider.getDimension() != -1 || owner.get() == world) return;
-        owner = new WeakReference<>(world);
-        CityManagerAccessor.setCityManager(null);
-        idle.clear();
-    }
-
-    public static synchronized void ensureCityManagerForNether(World world) {
-        if (world.isRemote || world != owner.get() || !ConfigLoader.hasCities()) return;
-        lastUse = System.nanoTime();
-        if (CityManagerAccessor.getCityManager() != null) return;
-        CityStructureManager manager = idle.get();
-        if (manager == null) {
-            manager = new CityStructureManager(world.getSeed());
-            manager.load(world);
-            manager.setDistance(ConfigLoader.getCityDistance());
+    public static synchronized CityStructureManager forGeneration(World world) {
+        if (world.isRemote || !ConfigLoader.hasCities()) return null;
+        NetherCityCache cache = WORLDS.computeIfAbsent(world, ignored -> new NetherCityCache());
+        cache.lastUse = System.nanoTime();
+        if (cache.active == null) {
+            cache.active = cache.idle.get();
+            if (cache.active == null) {
+                CityStructureManager manager = new CityStructureManager(world.getSeed());
+                manager.load(world);
+                manager.setDistance(ConfigLoader.getCityDistance());
+                cache.active = manager;
+            }
+            cache.idle.clear();
         }
-        CityManagerAccessor.setCityManager(manager);
-        idle.clear();
+        return cache.active;
     }
 
-    public static synchronized BlockPos computeNearestCityIfUnloaded(World world, int chunkX, int chunkZ) {
-        if (CityManagerAccessor.getCityManager() != null) return null;
-        int distance = Math.max(3, ConfigLoader.getCityDistance());
+    public static synchronized BlockPos nearestCity(World world, int chunkX, int chunkZ) {
+        NetherCityCache cache = WORLDS.get(world);
+        if (cache != null && cache.active != null) {
+            return cache.active.getNearestStructure(world, chunkX, chunkZ);
+        }
+        int distance = ConfigLoader.getCityDistance();
         int variance = distance / 3;
         int regionX = chunkX / distance;
         int regionZ = chunkZ / distance;
@@ -58,39 +59,36 @@ public final class NetherCityCache {
                 regionZ * distance + random.nextInt(variance) + variance);
     }
 
-    public static synchronized void onAfterWorldSave(World world) {
-        if (world == owner.get() && world.playerEntities.isEmpty()
-                && System.nanoTime() - lastUse > TimeUnit.SECONDS.toNanos(15)) {
-            release();
+    public static synchronized void save(World world) {
+        NetherCityCache cache = WORLDS.get(world);
+        if (cache == null || cache.active == null) return;
+        cache.active.save(world);
+        if (world.playerEntities.isEmpty() && System.nanoTime() - cache.lastUse > TimeUnit.SECONDS.toNanos(15)) {
+            cache.release();
         }
     }
 
-    private static void release() {
-        CityStructureManager manager = CityManagerAccessor.getCityManager();
-        if (manager != null) {
-            idle = new SoftReference<>(manager);
-            CityManagerAccessor.setCityManager(null);
-        }
+    private void release() {
+        idle = new SoftReference<>(active);
+        active = null;
     }
 
     @SubscribeEvent
     public static synchronized void onDimensionChange(PlayerEvent.PlayerChangedDimensionEvent event) {
-        World world = owner.get();
-        if (event.fromDim != -1 || world == null || !world.playerEntities.isEmpty()) return;
-        CityStructureManager manager = CityManagerAccessor.getCityManager();
-        if (manager != null) {
-            manager.save(world);
-            release();
+        for (Map.Entry<World, NetherCityCache> entry : WORLDS.entrySet()) {
+            World world = entry.getKey();
+            NetherCityCache cache = entry.getValue();
+            if (world.provider.getDimension() == event.fromDim && world.playerEntities.isEmpty() && cache.active != null) {
+                cache.active.save(world);
+                cache.release();
+            }
         }
     }
 
     @SubscribeEvent
     public static synchronized void onUnload(WorldEvent.Unload event) {
-        if (event.getWorld() != owner.get()) return;
-        CityStructureManager manager = CityManagerAccessor.getCityManager();
-        if (manager != null) manager.save(event.getWorld());
-        CityManagerAccessor.setCityManager(null);
-        idle.clear();
-        owner.clear();
+        World world = event.getWorld();
+        NetherCityCache cache = WORLDS.remove(world);
+        if (cache != null && cache.active != null) cache.active.save(world);
     }
 }

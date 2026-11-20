@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Pseudo
-@Mixin(targets = "mctmods.smelteryio.util.jei.JEI", remap = false)
+@Mixin(targets = "mctmods.smelteryio.library.util.jei.JEI", remap = false)
 public abstract class MixinSmelteryIoJei {
 
     @Unique
@@ -44,7 +44,7 @@ public abstract class MixinSmelteryIoJei {
             method = "register(Lmezz/jei/api/IModRegistry;)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lmctmods/smelteryio/util/jei/CMRecipeChecker;getCastingRecipes(Lmezz/jei/api/gui/IDrawable;Lmezz/jei/api/gui/IDrawable;)Ljava/util/List;"
+                    target = "Lmctmods/smelteryio/library/util/jei/CMRecipeChecker;getCastingRecipes(Lmezz/jei/api/gui/IDrawable;Lmezz/jei/api/gui/IDrawable;)Ljava/util/List;"
             ),
             remap = false,
             require = 1

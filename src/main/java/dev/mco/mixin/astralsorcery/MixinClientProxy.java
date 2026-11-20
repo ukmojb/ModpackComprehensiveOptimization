@@ -18,5 +18,7 @@ public abstract class MixinClientProxy {
             remap = false
     )
     private void mco$deferPerkTreeBufferInit() {
+        // 触发原类的静态纹理登记。绘制缓冲在首次打开技能树时分配。
+        PerkTreeTextures.getTextureSearchTextBG();
     }
 }

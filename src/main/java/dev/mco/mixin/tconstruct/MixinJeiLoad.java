@@ -1,34 +1,25 @@
 package dev.mco.mixin.tconstruct;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import dev.mco.internal.jei.TConMaterialRecipeIndex;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.gui.textures.Textures;
 import mezz.jei.startup.JeiStarter;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
 @Mixin(value = JeiStarter.class, remap = false)
 public abstract class MixinJeiLoad {
 
-    @Inject(
-            method = "load(Ljava/util/List;Lmezz/jei/gui/textures/Textures;Z)V",
-            at = @At("HEAD"),
-            remap = false
-    )
-    private void mco$onJeiLoadStart(List<IModPlugin> plugins, Textures textures, boolean isReload, CallbackInfo ci) {
+    @WrapMethod(method = "load(Ljava/util/List;Lmezz/jei/gui/textures/Textures;Z)V", remap = false)
+    private void mco$withMaterialIndex(List<IModPlugin> plugins, Textures textures, boolean isReload, Operation<Void> original) {
         TConMaterialRecipeIndex.beginLoad();
-    }
-
-    @Inject(
-            method = "load(Ljava/util/List;Lmezz/jei/gui/textures/Textures;Z)V",
-            at = @At("RETURN"),
-            remap = false
-    )
-    private void mco$onJeiLoadEnd(List<IModPlugin> plugins, Textures textures, boolean isReload, CallbackInfo ci) {
-        TConMaterialRecipeIndex.endLoad();
+        try {
+            original.call(plugins, textures, isReload);
+        } finally {
+            TConMaterialRecipeIndex.endLoad();
+        }
     }
 }

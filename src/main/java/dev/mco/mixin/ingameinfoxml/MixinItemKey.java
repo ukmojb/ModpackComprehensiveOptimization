@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Group;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Pseudo
@@ -20,11 +21,21 @@ public abstract class MixinItemKey implements IGIItemKeySnapshot {
     @Mutable
     private NBTTagCompound tagCompound;
 
+    @Group(name = "mco$nbtCopy", min = 1, max = 1)
     @Redirect(method = "<init>(Lnet/minecraft/item/ItemStack;Z)V",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/nbt/NBTTagCompound;copy()Lnet/minecraft/nbt/NBTTagCompound;"),
-            remap = true, require = 1)
+            remap = false, require = 0, expect = 0)
     private NBTTagCompound mco$borrowLookupNbt(NBTTagCompound tag) {
+        return tag;
+    }
+
+    @Group(name = "mco$nbtCopy", min = 1, max = 1)
+    @Redirect(method = "<init>(Lnet/minecraft/item/ItemStack;Z)V",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/nbt/NBTTagCompound;func_74737_b()Lnet/minecraft/nbt/NBTTagCompound;"),
+            remap = false, require = 0, expect = 0)
+    private NBTTagCompound mco$borrowLookupNbtSrg(NBTTagCompound tag) {
         return tag;
     }
 

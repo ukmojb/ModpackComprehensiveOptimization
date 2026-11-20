@@ -1,10 +1,10 @@
 package dev.mco.internal.cache;
 
+import dev.mco.ModpackComprehensiveOptimization;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.util.ResourceLocation;
 
-import dev.mco.ModpackComprehensiveOptimization;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class JAOPCAResourceCache {
 
-    private static final Map<ResourceLocation, Boolean> CACHE = new ConcurrentHashMap<>();
+    private static volatile Map<ResourceLocation, Boolean> cache = new ConcurrentHashMap<>();
 
     private JAOPCAResourceCache() {
     }
@@ -21,13 +21,7 @@ public final class JAOPCAResourceCache {
         if (location == null) {
             return false;
         }
-        Boolean cached = CACHE.get(location);
-        if (cached != null) {
-            return cached;
-        }
-        boolean exists = resourceExists(location);
-        CACHE.putIfAbsent(location, exists);
-        return exists;
+        return cache.computeIfAbsent(location, JAOPCAResourceCache::resourceExists);
     }
 
     private static boolean resourceExists(ResourceLocation location) {
@@ -42,6 +36,6 @@ public final class JAOPCAResourceCache {
     }
 
     public static void clear() {
-        CACHE.clear();
+        cache = new ConcurrentHashMap<>();
     }
 }

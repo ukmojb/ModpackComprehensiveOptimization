@@ -13,7 +13,7 @@ import java.util.Map;
 @Pseudo
 @Mixin(targets = "com.tmtravlr.additions.addon.advancements.ExtendedAdvancementManager", remap = false)
 public abstract class MixinAdvancementResources {
-    @Redirect(method = "func_192779_a", at = @At(value = "INVOKE",
+    @Redirect(method = {"reload", "func_192779_a"}, at = @At(value = "INVOKE",
             target = "Lnet/minecraftforge/common/ForgeHooks;loadAdvancements(Ljava/util/Map;)Z"), require = 1)
     private boolean mco$loadAdvancements(Map<ResourceLocation, Advancement.Builder> advancements) {
         return AdvancementResourceScope.load(advancements);

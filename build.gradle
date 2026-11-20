@@ -59,7 +59,7 @@ unimined.minecraft {
         if (use_access_transformer.toBoolean()) {
             accessTransformer "${rootProject.projectDir}/src/main/resources/$access_transformer_locations"
         }
-        loader "0.6.10-alpha"
+        loader "0.6.12-alpha"
         runs.all {
             args += ['--username', minecraft_username]
             def extraArgs = extra_jvm_args
@@ -188,13 +188,14 @@ jar {
         manifest {
             def attribute_map = [:]
             attribute_map['ModType'] = 'CRL'
-            attribute_map['MixinConfigs'] = 'mixins.mco.early.json'
+            attribute_map['MixinConnector'] = 'dev.mco.bootstrap.EarlyMixins'
             if (configurations.contain.size() > 0) {
                 attribute_map['ContainedDeps'] = configurations.contain.collect { it.name }.join(' ')
                 attribute_map['NonModDeps'] = true
             }
             if (is_coremod.toBoolean()) {
                 attribute_map['FMLCorePlugin'] = coremod_plugin_class_name
+                attribute_map['ForceLoadAsMod'] = true
                 if (coremod_includes_mod.toBoolean()) {
                     attribute_map['FMLCorePluginContainsFMLMod'] = true
                 }

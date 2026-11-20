@@ -1,76 +1,20 @@
 package dev.mco.mixin.mekanism;
 
-import mekanism.qioprocessing.common.content.workbench.QIOWorkbenchConfiguration;
+import dev.mco.internal.cache.QioRecipeScan;
 import mekanism.qioprocessing.common.planning.QIORecipeCatalogService;
-import mekanism.qioprocessing.common.planning.QIOWorkbenchRecipeCatalog;
-import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = QIORecipeCatalogService.class, remap = false)
 public abstract class MixinQIORecipeCatalogService {
-
-    @Shadow
-    private QIOWorkbenchRecipeCatalog.Snapshot snapshot;
-
-    @Shadow
-    private World world;
-
-    @Shadow
-    public abstract void refresh(World world);
-
-    @Inject(
-            method = "getSnapshot()Lmekanism/qioprocessing/common/planning/QIOWorkbenchRecipeCatalog$Snapshot;",
-            at = @At("HEAD"),
-            remap = false
-    )
-    private void mco$lazyInitSnapshot(CallbackInfoReturnable<QIOWorkbenchRecipeCatalog.Snapshot> cir) {
-        this.mco$ensureInitializedForSnapshot();
-    }
-
-    @Inject(
-            method = "getState()Lmekanism/qioprocessing/common/planning/QIORecipeCatalogService$State;",
-            at = @At("HEAD"),
-            remap = false
-    )
-    private void mco$lazyInitState(CallbackInfoReturnable<QIORecipeCatalogService.State> cir) {
-        this.mco$ensureInitializedForSnapshot();
-    }
-
-    @Inject(
-            method = "getSnapshot(Lmekanism/qioprocessing/common/content/workbench/QIOWorkbenchConfiguration;)Lmekanism/qioprocessing/common/planning/QIOWorkbenchRecipeCatalog$Snapshot;",
-            at = @At("HEAD"),
-            remap = false
-    )
-    private void mco$lazyInitConfiguredSnapshot(
-            QIOWorkbenchConfiguration configuration,
-            CallbackInfoReturnable<QIOWorkbenchRecipeCatalog.Snapshot> cir
-    ) {
-        this.mco$ensureInitializedForConfig();
-    }
-
-    @Unique
-    private void mco$ensureInitializedForSnapshot() {
-        if (this.snapshot == null) {
-            World targetWorld = this.world != null ? this.world : DimensionManager.getWorld(0);
-            if (targetWorld != null) {
-                this.refresh(targetWorld);
-            }
-        }
-    }
-
-    @Unique
-    private void mco$ensureInitializedForConfig() {
-        if (this.snapshot == null && this.world == null) {
-            World overworld = DimensionManager.getWorld(0);
-            if (overworld != null) {
-                this.refresh(overworld);
-            }
-        }
+    // 此时目录已绑定世界、清除旧缓存并递增版本，首次按配置查询会自行构建索引。
+    @Inject(method = "refresh(Lnet/minecraft/world/World;)V", at = @At(value = "FIELD",
+            target = "Lmekanism/qioprocessing/common/planning/QIORecipeCatalogService;revision:J",
+            opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER), cancellable = true)
+    private void mco$deferIndexBuild(CallbackInfo ci) {
+        if (QioRecipeScan.STARTUP.isBound()) ci.cancel();
     }
 }

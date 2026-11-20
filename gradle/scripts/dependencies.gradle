@@ -7,7 +7,14 @@ repositories {
     }
 }
 
+def packMods = file(providers.gradleProperty('echoesMods').getOrElse('G:/MC/.minecraft/versions/Echoes of Yore/mods'))
+
 dependencies {
+    for (def name : ['ChanceCubes-1.12.2-5.0.2.385-patched.jar', 'farmers-future-delight-1.6.1.jar']) {
+        def artifact = new File(packMods, name)
+        if (!artifact.isFile()) throw new GradleException("缺少编译依赖 ${artifact}")
+        compileOnly files(artifact)
+    }
     modCompileOnly 'curse.maven:additions-mod-321781:3000908'
     modCompileOnly 'curse.maven:astral-sorcery-241721:3044416'
     modCompileOnly 'curse.maven:avaritia-1.1x-kedition-913129:6118927'
@@ -30,7 +37,7 @@ dependencies {
     modCompileOnly 'curse.maven:projecte-226410:2702991'
     modCompileOnly 'curse.maven:raids-backport-977633:7890943'
     modCompileOnly 'curse.maven:recipe-stages-280554:3405071'
-    modCompileOnly 'curse.maven:tconstruct-74072:2902483'
+    modCompileOnly 'curse.maven:tinkers-antique-1242239:8469500'
     modCompileOnly 'curse.maven:thaumic-concilium-kedition-1329883:8392890'
     modCompileOnly 'curse.maven:the-spice-of-life-220811:2571951'
     modCompileOnly 'curse.maven:thermal-expansion-69163:2926431'
