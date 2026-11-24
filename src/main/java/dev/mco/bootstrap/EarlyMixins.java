@@ -18,6 +18,10 @@ public final class EarlyMixins implements IMixinConnector {
     @Override
     public void connect() {
         var mods = CleanroomModDiscoverer.instance().presentMods();
+        String baseModels = "mixins.mco.early.base.json";
+        if (new Context(baseModels, mods).isModPresent("base") && Boolean.parseBoolean(System.getProperty("mco.base", "true"))) {
+            Mixins.addConfiguration(baseModels);
+        }
         TARGETS.forEach((config, module) -> {
             if (PatchSelection.enabled(new Context(config, mods), module)) Mixins.addConfiguration(config);
         });

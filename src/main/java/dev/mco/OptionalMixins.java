@@ -15,7 +15,7 @@ public final class OptionalMixins implements ILateMixinLoader {
                 if (!context.isModPresent(mod)) return false;
             }
             return (marker == null || OptionalMixins.class.getClassLoader().getResource(marker) != null)
-                    && PatchSelection.enabled(context, mods[0]);
+                    && PatchSelection.enabled(context, name.equals("avaritia.recipes") ? name : mods[0]);
         }
     }
 
@@ -23,6 +23,9 @@ public final class OptionalMixins implements ILateMixinLoader {
             new Patch("additions", null, "additions"),
             new Patch("astralsorcery", null, "astralsorcery"),
             new Patch("avaritia", null, "avaritia"),
+            new Patch("avaritia.recipes", null, "avaritia"),
+            new Patch("base", null, "base"),
+            new Patch("libnine", null, "libnine"),
             new Patch("betternether", "paulevs/betternether/noise/PregennedOpenSimplexNoise.class", "betternether"),
             new Patch("chancecubes", null, "chancecubes"),
             new Patch("chancecubes.astral", null, "chancecubes", "astralsorcery"),
